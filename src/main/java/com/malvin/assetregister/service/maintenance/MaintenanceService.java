@@ -71,7 +71,7 @@ public class MaintenanceService implements IMaintenanceService  {
     @Override
     public List<Maintenance> notifyMaintenanceDue() {
         return maintenanceRepository.findByScheduledDateBetween(
-                LocalDate.now(), LocalDate.now().plusDays(7)
+                LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(7).atStartOfDay()
         );
     }
 

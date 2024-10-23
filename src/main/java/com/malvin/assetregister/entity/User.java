@@ -20,9 +20,6 @@ public class User {
     @NaturalId
     private String email;
     private String password;
-//    @ManyToOne
-//    @JoinColumn(name = "company_id", nullable = false)
-//    private Company company;
 
     @Enumerated(EnumType.STRING)
     private Role role;

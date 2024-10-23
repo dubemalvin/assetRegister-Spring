@@ -1,7 +1,6 @@
 package com.malvin.assetregister.service.asset;
 
 import com.malvin.assetregister.entity.Asset;
-import com.malvin.assetregister.enums.AssetStatus;
 import com.malvin.assetregister.request.AddAssetReq;
 import com.malvin.assetregister.request.UpdateAssetReq;
 

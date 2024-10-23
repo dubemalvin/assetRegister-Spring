@@ -5,5 +5,5 @@ public enum AssetStatus {
     OLD,
     RETIRED,
     DEPRECIATION,
-    DECOMMISSIONED  // Asset no longer in use or discarded
+    DECOMMISSIONED
 }

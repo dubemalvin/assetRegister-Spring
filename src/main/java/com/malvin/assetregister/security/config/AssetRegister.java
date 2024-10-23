@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class AssetRegister {
     private final AuthUserDetailsService userDetailsService;
     private final JwtAuthEntryPoint authEntryPoint;

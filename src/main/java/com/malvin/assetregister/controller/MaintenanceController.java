@@ -115,7 +115,6 @@ public class MaintenanceController {
         }
     }
 
-
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/cancelled-maintenance")
     public ResponseEntity<ApiResponse> cancelledMaintenances(){

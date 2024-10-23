@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MaintenanceRepository extends JpaRepository<Maintenance,Long> {
-    List<Maintenance> findByScheduledDateBetween(LocalDate now, LocalDate localDate);
+    List<Maintenance> findByScheduledDateBetween(LocalDateTime scheduledDate, LocalDateTime scheduledDate2);
 
     List<Maintenance> findByAsset(Asset asset);
 

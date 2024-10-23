@@ -14,7 +14,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         addSampleUsers();
     }
 

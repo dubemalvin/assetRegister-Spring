@@ -22,7 +22,6 @@ public class Category {
     private String description;
     @Enumerated(EnumType.STRING)
     private DepreciationMethod depreciationMethod;
-    //private int depreciationInterval;
 
     @JsonIgnore
     @OneToMany(mappedBy = "category")
@@ -31,12 +30,5 @@ public class Category {
     @OneToOne(mappedBy = "category", cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name ="depreciationId")
     private DepreciationRecord depreciation;
-
-    public Category(String name, String description, int depreciationInterval, List<Asset> asset, DepreciationRecord depreciation) {
-        this.name = name;
-        this.description = description;
-//        this.depreciationInterval = depreciationInterval;
-        this.asset = asset;
-        this.depreciation = depreciation;
-    }
+    
 }

@@ -13,12 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,7 +26,7 @@ public class DepreciationService implements IDepreciationService {
     private final MaintenanceRepository maintenanceRepository;
     private final IAssetService assetService;
 
-//    @Async
+    @Async
     @Scheduled(cron = "*/60 * * * * *")
     @Override
     public void runScheduledDepreciation() {
@@ -82,7 +79,6 @@ public class DepreciationService implements IDepreciationService {
                 .orElse(LocalDateTime.now()); // Default value if no records
     }
 
-
     @Override
     public BigDecimal getCostOfMaintenanceSinceLastDepreciation(Long assetId) {
         Asset asset = assetService.getAssetById(assetId);
@@ -101,8 +97,6 @@ public class DepreciationService implements IDepreciationService {
                 .map(maintenance -> maintenance.getCost() != null ? maintenance.getCost() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-
 
     private BigDecimal calculateDepreciation(Asset asset) {
         BigDecimal depreciationAmount;

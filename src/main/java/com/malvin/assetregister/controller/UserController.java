@@ -49,7 +49,7 @@ public class UserController {
             return ResponseEntity.status(UNAUTHORIZED).body(new ApiResponse( e.getMessage(),null));
         }
     }
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
     public  ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserReq request){
         try {

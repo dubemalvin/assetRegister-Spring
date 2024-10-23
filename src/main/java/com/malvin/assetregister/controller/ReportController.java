@@ -10,17 +10,6 @@ import java.time.LocalDateTime;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-
-
-
-
-
-
-
-
-
-
-
 @RestController
 @RequestMapping("${api.prefix}/reports")
 @RequiredArgsConstructor
