@@ -16,12 +16,12 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
     private String fileName;
     private String fileType;
 
     @Lob
     private Blob image;
+    private String downloadUrl;
 
     @JsonIgnore
     @ManyToOne
