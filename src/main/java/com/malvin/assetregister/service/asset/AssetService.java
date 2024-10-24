@@ -1,14 +1,19 @@
 package com.malvin.assetregister.service.asset;
 
+import com.malvin.assetregister.dto.AssetDto;
+import com.malvin.assetregister.dto.ImageDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.entity.Category;
+import com.malvin.assetregister.entity.Image;
 import com.malvin.assetregister.enums.DepreciationMethod;
 import com.malvin.assetregister.exception.ResourceNotFoundException;
 import com.malvin.assetregister.repository.AssetRepository;
 import com.malvin.assetregister.repository.CategoryRepository;
+import com.malvin.assetregister.repository.ImageRepository;
 import com.malvin.assetregister.request.AddAssetReq;
 import com.malvin.assetregister.request.UpdateAssetReq;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +25,8 @@ import java.util.Optional;
 public class AssetService implements IAssetService {
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     @Override
     public Asset addAsset(AddAssetReq request) {
@@ -120,7 +127,6 @@ public class AssetService implements IAssetService {
                 .toList();
     }
 
-
     @Override
     public List<Asset> getByInitialValueRange(BigDecimal min, BigDecimal max) {
         return assetRepository.findByInitialValueBetween(min,max);
@@ -135,4 +141,25 @@ public class AssetService implements IAssetService {
     public Integer countAssets() {
         return Math.toIntExact(assetRepository.count());
     }
+
+    @Override
+    public AssetDto convertToDto(Asset asset){
+        AssetDto assetDto = modelMapper.map(asset,AssetDto.class);
+        List<Image> images = imageRepository.findByAssetId(asset.getId());
+        List<ImageDto> imageDtoList = images.
+                stream()
+                .map(image -> modelMapper
+                        .map(image,ImageDto.class))
+                .toList();
+        assetDto.setImage(imageDtoList);
+        return assetDto;
+    }
+
+    @Override
+    public List<AssetDto> convertToDtoList(List<Asset> assets){
+            return assets
+                    .stream()
+                    .map(this::convertToDto)
+                    .toList();
+        }
 }

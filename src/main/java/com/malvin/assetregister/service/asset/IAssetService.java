@@ -1,5 +1,6 @@
 package com.malvin.assetregister.service.asset;
 
+import com.malvin.assetregister.dto.AssetDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.request.AddAssetReq;
 import com.malvin.assetregister.request.UpdateAssetReq;
@@ -23,4 +24,8 @@ public interface IAssetService {
     List<Asset> getByInitialValueRange(BigDecimal min, BigDecimal max);
     Integer countByCategoryName(String category);
     Integer countAssets();
+
+    AssetDto convertToDto(Asset asset);
+
+    List<AssetDto> convertToDtoList(List<Asset> assets);
 }

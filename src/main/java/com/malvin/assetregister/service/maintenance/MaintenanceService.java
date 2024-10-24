@@ -1,5 +1,6 @@
 package com.malvin.assetregister.service.maintenance;
 
+import com.malvin.assetregister.dto.MaintenanceDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.entity.Maintenance;
 import com.malvin.assetregister.enums.MaintenanceStatus;
@@ -7,6 +8,7 @@ import com.malvin.assetregister.exception.ResourceNotFoundException;
 import com.malvin.assetregister.repository.MaintenanceRepository;
 import com.malvin.assetregister.service.asset.IAssetService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +23,11 @@ import java.util.List;
 public class MaintenanceService implements IMaintenanceService  {
     private final MaintenanceRepository maintenanceRepository;
     private final IAssetService assetService;
+    private final ModelMapper modelMapper;
 
     @Override
     public Maintenance scheduleMaintenance(Asset asset, Maintenance request) {
-        Asset asset1= assetService.getAssetById(asset.getId());
+        Asset asset1 = assetService.getAssetById(asset.getId());
         Maintenance maintenance = new Maintenance();
         maintenance.setAsset(asset1);
         maintenance.setToday(LocalDateTime.now());
@@ -33,29 +36,49 @@ public class MaintenanceService implements IMaintenanceService  {
         maintenance.setCost(request.getCost());
         maintenance.setStatus(MaintenanceStatus.SCHEDULED);
         maintenance.setType(request.getType());
-       return maintenanceRepository.save(maintenance);
+        return maintenanceRepository.save(maintenance);
     }
 
     @Override
-    public Maintenance performMaintenance(Maintenance request,Long id) {
-        Maintenance asset =maintenanceRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Maintenance with this "+id+" was not scheduled"));
-        asset.setPerformedDate(request.getPerformedDate());
-        asset.setDetails(request.getDetails());
-        asset.setStatus(MaintenanceStatus.UNDER_MAINTENANCE);
-        return maintenanceRepository.save(asset);
+    public Maintenance performMaintenance(Maintenance request, Long id) {
+        Maintenance maintenance = maintenanceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Maintenance with this " + id + " was not scheduled"));
+
+        if (maintenance.getPerformedDate() != null) {
+            throw new IllegalStateException("Maintenance with ID " + id + " has already been performed.");
+        }
+
+        if (maintenance.getScheduledDate().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Maintenance with ID " + id + " cannot be performed before the scheduled date.");
+        }
+
+        maintenance.setPerformedDate(request.getPerformedDate());
+        maintenance.setDetails(request.getDetails());
+        maintenance.setStatus(MaintenanceStatus.UNDER_MAINTENANCE);
+        return maintenanceRepository.save(maintenance);
     }
 
     @Override
-    public Maintenance maintenanceFinished(Maintenance request,Long id) {
-        Maintenance asset =maintenanceRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Maintenance with this "+id+" was not scheduled"));
-        asset.setDayOfCompletion(LocalDateTime.now());
-        asset.setDetails(request.getDetails());
-        asset.setCost(request.getCost());
-        asset.setStatus(request.getStatus());
-        asset.setDowntime(downtime(LocalDate.from(asset.getScheduledDate()), LocalDate.now().atStartOfDay()));
-        return maintenanceRepository.save(asset);
+    public Maintenance maintenanceFinished(Maintenance request, Long id) {
+        Maintenance maintenance = maintenanceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Maintenance with this " + id + " was not scheduled"));
+
+        // Check if the maintenance has been performed before marking it finished
+        if (maintenance.getPerformedDate() == null) {
+            throw new IllegalStateException("Maintenance with ID " + id + " must be performed before it can be finished.");
+        }
+
+        // Ensure maintenance finished is not set before it has been performed
+        if (maintenance.getPerformedDate().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Maintenance with ID " + id + " cannot be marked as finished before it has been performed.");
+        }
+
+        maintenance.setDayOfCompletion(LocalDateTime.now());
+        maintenance.setDetails(request.getDetails());
+        maintenance.setCost(request.getCost());
+        maintenance.setStatus(request.getStatus());
+        maintenance.setDowntime(downtime(LocalDate.from(maintenance.getScheduledDate()), LocalDate.now().atStartOfDay()));
+        return maintenanceRepository.save(maintenance);
     }
 
     @Override
@@ -108,8 +131,12 @@ public class MaintenanceService implements IMaintenanceService  {
 
     @Override
     public List<Maintenance> getMaintenanceHistory(Long id) {
-        Asset asset1= assetService.getAssetById(id);
-        return maintenanceRepository.findByAsset(asset1);
+        try {
+            Asset asset1= assetService.getAssetById(id);
+            return maintenanceRepository.findByAsset(asset1);
+        } catch (Exception e) {
+            throw new RuntimeException("error occurred");
+        }
     }
 
     @Override
@@ -125,6 +152,19 @@ public class MaintenanceService implements IMaintenanceService  {
     @Override
     public List<Maintenance> underMaintenance() {
         return maintenanceRepository.findByStatus(MaintenanceStatus.UNDER_MAINTENANCE);
+    }
+
+    @Override
+    public MaintenanceDto convertToDto(Maintenance record){
+        return modelMapper.map(record,MaintenanceDto.class);
+    }
+
+    @Override
+    public List<MaintenanceDto> convertToDtoList(List<Maintenance> records){
+        return records
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
 

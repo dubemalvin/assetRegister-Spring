@@ -1,5 +1,6 @@
 package com.malvin.assetregister.service.depreciation;
 
+import com.malvin.assetregister.dto.DepreciationDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.entity.DepreciationRecord;
 import com.malvin.assetregister.entity.Maintenance;
@@ -10,6 +11,7 @@ import com.malvin.assetregister.repository.DepreciationRecordRepository;
 import com.malvin.assetregister.repository.MaintenanceRepository;
 import com.malvin.assetregister.service.asset.IAssetService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class DepreciationService implements IDepreciationService {
     private final AssetRepository assetRepository;
     private final MaintenanceRepository maintenanceRepository;
     private final IAssetService assetService;
+    private final ModelMapper modelMapper;
 
     @Async
     @Scheduled(cron = "*/60 * * * * *")
@@ -112,5 +115,18 @@ public class DepreciationService implements IDepreciationService {
                 throw new RuntimeException("Unsupported depreciation method");
         }
         return depreciationAmount;
+    }
+
+    @Override
+    public DepreciationDto convertToDto(DepreciationRecord record){
+        return modelMapper.map(record,DepreciationDto.class);
+    }
+
+    @Override
+    public List<DepreciationDto> convertToDtoList(List<DepreciationRecord> records){
+        return records
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 }

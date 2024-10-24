@@ -7,6 +7,7 @@ import com.malvin.assetregister.exception.ResourceNotFoundException;
 import com.malvin.assetregister.repository.ImageRepository;
 import com.malvin.assetregister.service.asset.IAssetService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,8 @@ import java.util.List;
 public class ImageService implements  IImageService{
     private final ImageRepository imageRepository;
     private final IAssetService assetService;
+    private final ModelMapper modelMapper;
+
     @Override
     public List<ImageDto> saveImage(List<MultipartFile> files, Long assetId) {
         Asset asset = assetService.getAssetById(assetId);
@@ -82,11 +85,18 @@ public class ImageService implements  IImageService{
     @Override
     public List<Image> getImagesByAsset(Long assetId) {
         Asset asset = assetService.getAssetById(assetId);
-        return asset.getImage()
+        return asset.getImage();
+    }
+
+    @Override
+    public ImageDto convertToDto(Image image){
+        return modelMapper.map(image, ImageDto.class);
+    }
+    @Override
+    public List<ImageDto> convertToDtoList(List<Image> images){
+        return images
                 .stream()
-                .filter(image -> image.getFileName()!= null&&
-                        image.getFileType()!= null&&
-                        image.getDownloadUrl()!= null)
+                .map(this::convertToDto)
                 .toList();
     }
 }

@@ -34,7 +34,6 @@ public class Maintenance {
     @Enumerated(EnumType.STRING)
     private MaintenanceStatus status;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id")
     private Asset asset;

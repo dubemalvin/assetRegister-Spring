@@ -1,5 +1,6 @@
 package com.malvin.assetregister.service.depreciation;
 
+import com.malvin.assetregister.dto.DepreciationDto;
 import com.malvin.assetregister.entity.DepreciationRecord;
 
 import java.math.BigDecimal;
@@ -20,4 +21,8 @@ public interface IDepreciationService {
     LocalDateTime lastDepreciation(Long assetId);
 
     BigDecimal getCostOfMaintenanceSinceLastDepreciation(Long assetId);
+
+    DepreciationDto convertToDto(DepreciationRecord record);
+
+    List<DepreciationDto> convertToDtoList(List<DepreciationRecord> records);
 }

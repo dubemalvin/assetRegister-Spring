@@ -1,6 +1,7 @@
 package com.malvin.assetregister.controller;
 
 
+import com.malvin.assetregister.dto.AssetDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.exception.ResourceNotFoundException;
 import com.malvin.assetregister.request.AddAssetReq;
@@ -26,7 +27,7 @@ public class AssetController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse>  addAsset(@RequestBody AddAssetReq request) {
+    public ResponseEntity<ApiResponse> addAsset(@RequestBody AddAssetReq request) {
         try {
             Asset asset = assetService.addAsset(request);
             return ResponseEntity.ok( new ApiResponse("Asset Added Successfully", asset));
@@ -40,7 +41,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetById(@PathVariable Long id){
         try {
             Asset asset = assetService.getAssetById(id);
-            return ResponseEntity.ok( new ApiResponse("Asset Successfully Retrieved", asset));
+            AssetDto dto = assetService.convertToDto(asset);
+            return ResponseEntity.ok( new ApiResponse("Asset Successfully Retrieved", dto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -51,7 +53,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> updateAsset(@RequestBody UpdateAssetReq request,@PathVariable Long id){
         try {
             Asset asset = assetService.updateAsset(request,id);
-            return ResponseEntity.ok( new ApiResponse("Asset Update Success", asset));
+            AssetDto dto = assetService.convertToDto(asset);
+            return ResponseEntity.ok( new ApiResponse("Asset Update Success", dto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
@@ -73,7 +76,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAllAssets(){
         try {
             List<Asset> assets = assetService.getAllAssets();
-            return ResponseEntity.ok(new ApiResponse("Assets retrieved Successfully",assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets retrieved Successfully",dtos));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("Oops! error occurred", null));
         }
@@ -84,7 +88,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetsByCategory(@RequestParam String category){
         try {
             List<Asset> assets= assetService.getByCategory(category);
-            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Oops!! Not Found", null));
         }
@@ -95,7 +100,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetsByName(@RequestParam String name){
         try {
             List<Asset> assets= assetService.getByName(name);
-            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Oops!! Not Found", null));
         }
@@ -106,7 +112,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetsByStatus(@RequestParam String status){
         try {
             List<Asset> assets= assetService.getByStatus(status);
-            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Oops!! Not Found", null));
         }
@@ -117,7 +124,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetsByCategoryAndStatus(@RequestParam String category,@RequestParam String status){
         try {
             List<Asset> assets= assetService.getByCategoryAndStatus(category, status);
-            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Oops!! Not Found", null));
         }
@@ -128,7 +136,8 @@ public class AssetController {
     public ResponseEntity<ApiResponse> getAssetsByInitialValueRange(@RequestParam BigDecimal min, @RequestParam BigDecimal max){
         try {
             List<Asset> assets= assetService.getByInitialValueRange(min, max);
-            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", assets));
+            List<AssetDto> dtos =assetService.convertToDtoList(assets);
+            return ResponseEntity.ok(new ApiResponse("Assets Retrieved Successfully", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Oops!! Not Found", null));
         }

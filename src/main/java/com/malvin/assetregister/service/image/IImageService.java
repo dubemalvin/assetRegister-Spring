@@ -13,4 +13,8 @@ public interface IImageService {
     void deleteImage(Long imageId);
 
     List<Image> getImagesByAsset(Long assetId);
+
+    ImageDto convertToDto(Image image);
+
+    List<ImageDto> convertToDtoList(List<Image> images);
 }

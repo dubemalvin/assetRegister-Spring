@@ -68,7 +68,8 @@ public class ImageController {
     public ResponseEntity<ApiResponse> getImages(@PathVariable Long assetId){
         try {
             List<Image> images = imageService.getImagesByAsset(assetId);
-            return ResponseEntity.ok(new ApiResponse("Images Retrieved Successfully",images));
+            List<ImageDto> dtos = imageService.convertToDtoList(images);
+            return ResponseEntity.ok(new ApiResponse("Images Retrieved Successfully",dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(),null));
         }

@@ -1,5 +1,6 @@
 package com.malvin.assetregister.service.maintenance;
 
+import com.malvin.assetregister.dto.MaintenanceDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.entity.Maintenance;
 
@@ -21,4 +22,7 @@ public interface IMaintenanceService {
     List<Maintenance> cancelledMaintenances();
     List<Maintenance> underMaintenance();
 
+    MaintenanceDto convertToDto(Maintenance record);
+
+    List<MaintenanceDto> convertToDtoList(List<Maintenance> records);
 }

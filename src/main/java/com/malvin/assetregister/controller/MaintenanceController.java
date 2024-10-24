@@ -1,5 +1,6 @@
 package com.malvin.assetregister.controller;
 
+import com.malvin.assetregister.dto.MaintenanceDto;
 import com.malvin.assetregister.entity.Asset;
 import com.malvin.assetregister.entity.Maintenance;
 import com.malvin.assetregister.exception.ResourceNotFoundException;
@@ -63,7 +64,8 @@ public class MaintenanceController {
     public ResponseEntity<ApiResponse> notifyMaintenanceDue(){
         try {
             List<Maintenance> maintenances=maintenanceService.notifyMaintenanceDue();
-            return ResponseEntity.ok(new ApiResponse("Success", maintenances));
+            List<MaintenanceDto> dtos = maintenanceService.convertToDtoList(maintenances);
+            return ResponseEntity.ok(new ApiResponse("Success", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
@@ -92,11 +94,12 @@ public class MaintenanceController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    @GetMapping("/{id}/maintenance-history")
-    public ResponseEntity<ApiResponse> getMaintenanceHistory(@PathVariable Long id){
+    @GetMapping("/{assetId}/maintenance-history")
+    public ResponseEntity<ApiResponse> getMaintenanceHistory(@PathVariable Long assetId){
         try {
-            List<Maintenance> maintenances=maintenanceService.getMaintenanceHistory(id);
-            return ResponseEntity.ok(new ApiResponse("Success", maintenances));
+            List<Maintenance> maintenances=maintenanceService.getMaintenanceHistory(assetId);
+            List<MaintenanceDto> dtos = maintenanceService.convertToDtoList(maintenances);
+            return ResponseEntity.ok(new ApiResponse("Success", dtos));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }catch (Exception e){
@@ -109,7 +112,8 @@ public class MaintenanceController {
     public ResponseEntity<ApiResponse> getScheduledMaintenance(){
         try {
             List<Maintenance> maintenances=maintenanceService.getScheduledMaintenance();
-            return ResponseEntity.ok(new ApiResponse("Success", maintenances));
+            List<MaintenanceDto> dtos = maintenanceService.convertToDtoList(maintenances);
+            return ResponseEntity.ok(new ApiResponse("Success", dtos));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
@@ -120,7 +124,8 @@ public class MaintenanceController {
     public ResponseEntity<ApiResponse> cancelledMaintenances(){
         try {
             List<Maintenance> maintenances=maintenanceService.cancelledMaintenances();
-            return ResponseEntity.ok(new ApiResponse("Success", maintenances));
+            List<MaintenanceDto> dtos = maintenanceService.convertToDtoList(maintenances);
+            return ResponseEntity.ok(new ApiResponse("Success", dtos));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }
@@ -132,7 +137,8 @@ public class MaintenanceController {
     public ResponseEntity<ApiResponse> underMaintenances(){
         try {
             List<Maintenance> maintenances=maintenanceService.underMaintenance();
-            return ResponseEntity.ok(new ApiResponse("Success", maintenances));
+            List<MaintenanceDto> dtos = maintenanceService.convertToDtoList(maintenances);
+            return ResponseEntity.ok(new ApiResponse("Success", dtos));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
         }

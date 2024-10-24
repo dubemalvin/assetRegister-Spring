@@ -9,6 +9,5 @@ import java.sql.Blob;
 public class ImageDto {
     private Long imageId;
     private String fileName;
-
     private String downloadUrl;
 }
