@@ -32,15 +32,16 @@ public class Asset {
     @OneToMany(mappedBy = "asset",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> image;
 
+    @OneToMany(mappedBy = "asset",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Document> documents;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Maintenance> maintenanceRecords;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "asset",fetch = FetchType.EAGER, cascade = CascadeType.ALL,orphanRemoval = true)
     private List<DepreciationRecord> deps;
 

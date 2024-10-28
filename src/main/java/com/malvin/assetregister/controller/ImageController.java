@@ -43,6 +43,7 @@ public class ImageController {
             return new ResponseEntity<>(new ApiResponse(e.getMessage(),null), NOT_FOUND);
         }
     }
+
     @GetMapping("/download/{imageId}")
     public ResponseEntity<Resource> getImage(@PathVariable Long imageId){
         try {
@@ -55,6 +56,7 @@ public class ImageController {
                 throw new RuntimeException();
         }
     }
+
     @PutMapping("/{imageId}/update")
     public ResponseEntity<ApiResponse> updateImage(@PathVariable Long imageId, @RequestParam MultipartFile file){
         try {

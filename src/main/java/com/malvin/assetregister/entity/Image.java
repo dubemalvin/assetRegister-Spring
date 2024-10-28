@@ -23,7 +23,6 @@ public class Image {
     private Blob image;
     private String downloadUrl;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "asset_id")
     private Asset asset;
