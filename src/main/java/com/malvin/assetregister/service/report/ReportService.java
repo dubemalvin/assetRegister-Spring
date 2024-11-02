@@ -6,6 +6,7 @@ import com.malvin.assetregister.exception.ResourceNotFoundException;
 import com.malvin.assetregister.repository.CategoryRepository;
 import com.malvin.assetregister.service.asset.IAssetService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class ReportService implements IReportService {
     private final IAssetService assetService;
 
     @Override
-    public Map<String, Object> generateReport(String reportType, String filter, LocalDateTime startDate, LocalDateTime endDate) {
+    public Map<String, Object> generateReport(@NotNull String reportType, String filter, LocalDateTime startDate, LocalDateTime endDate) {
         try {
             return switch (reportType.toLowerCase()) {
                 case "category" -> getCategoryReport(filter, startDate, endDate);
@@ -34,17 +35,20 @@ public class ReportService implements IReportService {
         }
     }
 
+    @NotNull
     private Map<String, Object> getCategoryReport(String filter, LocalDateTime startDate, LocalDateTime endDate) {
         try {
             Category category = Optional.ofNullable(categoryRepository.findByName(filter))
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
-            BigDecimal currentCost = category.getAsset().stream()
+            BigDecimal currentCost = category.getAsset()
+                    .stream()
                     .map(Asset::getCurrentValue)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             int downtime = category.getAsset().stream()
-                    .flatMap(asset -> asset.getMaintenanceRecords().stream()
+                    .flatMap(asset -> asset.getMaintenanceRecords()
+                            .stream()
                             .filter(record -> {
                                 LocalDateTime completionDate = record.getDayOfCompletion(); // Capture the completion date
                                 return completionDate != null && // Check for null
@@ -55,8 +59,10 @@ public class ReportService implements IReportService {
                     .sum();
 
 
-            Map<MaintenanceStatus, Long> statusCounts = category.getAsset().stream()
-                    .flatMap(asset -> asset.getMaintenanceRecords().stream())
+            Map<MaintenanceStatus, Long> statusCounts = category.getAsset()
+                    .stream()
+                    .flatMap(asset -> asset.getMaintenanceRecords()
+                            .stream())
                     .collect(Collectors.groupingBy(Maintenance::getStatus, Collectors.counting()));
 
             // Build the response map
@@ -72,6 +78,7 @@ public class ReportService implements IReportService {
         }
     }
 
+    @NotNull
     private Map<String, Object> getAssetReport(Long assetId) {
         Asset asset = assetService.getAssetById(assetId);
 
@@ -81,16 +88,16 @@ public class ReportService implements IReportService {
         result.put("lastDepreciationDate", asset.getDeps().getLast().getCalculationDate());
         result.put("depreciationAmount", asset.getDeps().getLast().getDepreciationAmount());
 
-        List<Maintenance> scheduledMaintenance = asset.getMaintenanceRecords().stream()
+        List<Maintenance> scheduledMaintenance = asset.getMaintenanceRecords()
+                .stream()
                 .filter(maintenance -> maintenance.getStatus() == MaintenanceStatus.SCHEDULED)
                 .toList();
         result.put("scheduledMaintenance", scheduledMaintenance);
-
         result.put("lastMaintenance", asset.getMaintenanceRecords().getLast());
-
         return result;
     }
 
+    @NotNull
     private Map<String, Object> getMaintenanceReport(LocalDateTime startDate, LocalDateTime endDate) {
         List<Category> categories = categoryRepository.findAll();
         List<Map<String, Object>> categoryReports = new ArrayList<>();
@@ -114,18 +121,23 @@ public class ReportService implements IReportService {
         return result;
     }
 
+    @NotNull
     private Map<String, Object> getDepreciationReport() {
         List<Category> categories = categoryRepository.findAll();
         List<Map<String, Object>> categoryReports = new ArrayList<>();
 
         for (Category category : categories) {
-            BigDecimal totalCurrentCost = category.getAsset().stream()
-                    .flatMap(asset -> asset.getDeps().stream())
+            BigDecimal totalCurrentCost = category.getAsset()
+                    .stream()
+                    .flatMap(asset -> asset.getDeps()
+                            .stream())
                     .map(DepreciationRecord::getCurrentValue)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal totalDepreciationAmount = category.getAsset().stream()
-                    .flatMap(asset -> asset.getDeps().stream())
+            BigDecimal totalDepreciationAmount = category.getAsset()
+                    .stream()
+                    .flatMap(asset -> asset.getDeps()
+                            .stream())
                     .map(DepreciationRecord::getDepreciationAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -135,7 +147,6 @@ public class ReportService implements IReportService {
             categoryReport.put("totalDepreciationAmount", totalDepreciationAmount);
             categoryReports.add(categoryReport);
         }
-
         // Build the final response map
         Map<String, Object> result = new HashMap<>();
         result.put("depreciationReports", categoryReports);

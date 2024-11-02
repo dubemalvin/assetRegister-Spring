@@ -15,6 +15,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @RequiredArgsConstructor
 public class ReportController {
     private final IReportService reportService;
+
     @GetMapping("/report")
     public ResponseEntity<ApiResponse> generateReport(@RequestParam String reportType,
                                                       @RequestParam String filter,

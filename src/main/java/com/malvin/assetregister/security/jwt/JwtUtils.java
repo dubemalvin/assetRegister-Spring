@@ -25,7 +25,8 @@ public class JwtUtils {
         AuthUserDetails userPrincipal = (AuthUserDetails) authentication.getPrincipal();
         List<String> roles = userPrincipal.getAuthorities()
                 .stream()
-                .map(GrantedAuthority::getAuthority).toList();
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         return Jwts.builder()
                 .setSubject(userPrincipal.getUser().getEmail())
